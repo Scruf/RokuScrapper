@@ -29,7 +29,9 @@ request(url, function(error, response, html){
       	
     })
 		
-   
+  for(var a in arr){
+  	console.log(arr[a].name);
+  }
 }
 
 // To write to the system we will use the built in 'fs' library.
