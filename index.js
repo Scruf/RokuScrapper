@@ -3,7 +3,11 @@ var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
-
+function RokuChannels(name,url,description){
+	this.name = name;
+	this.url = url;
+	this.description = description;
+}
 app.get('/scrape', function(req, res){
 
 url = 'http://www.rokuguide.com/channels';
@@ -13,14 +17,18 @@ request(url, function(error, response, html){
         var $ = cheerio.load(html);
 
     var name, url,description;
-    var json = { name : "", url : "",description: ""};
+    var json = [{ name : "", url : "",description: ""}];
     var arr = [];
     $('div.view-content  table  tbody tr').each(function(){
         var data = $(this);
-     json.description=data.children().text();
-      arr.push(json.description);
+        url=data.children().children().next().children().children().attr('href');
+    	description=data.children().text();
+    	name = data.children().children().next().children().children().text();
+    	arr.push(new RokuChannels(name,url,description));
+
+      	
     })
-	console.log(arr);	
+		
    
 }
 
