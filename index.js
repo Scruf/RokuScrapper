@@ -12,15 +12,15 @@ request(url, function(error, response, html){
     if(!error){
         var $ = cheerio.load(html);
 
-    var name, url;
-    var json = { name : "", url : ""};
-
-    $('div.view-content > table > tbody tr').each(function(){
+    var name, url,description;
+    var json = { name : "", url : "",description: ""};
+    var arr = [];
+    $('div.view-content  table  tbody tr').each(function(){
         var data = $(this);
-      	json.name=data.children().first().attr('href');
-      
+     json.description=data.children().text();
+      arr.push(json.description);
     })
-
+	console.log(arr);	
    
 }
 
@@ -41,6 +41,7 @@ res.send('Check your console!')
 
     }) ;
 })
+
 app.listen('8081')
 console.log('Magic happens on port 8081');
 exports = module.exports = app;
