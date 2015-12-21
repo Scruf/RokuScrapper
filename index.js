@@ -5,16 +5,20 @@ var cheerio = require('cheerio');
 var arr = [];
 var name,url,description;
 var app     = express();
+function buildPath(a,b){
+	return a+b;
+}
 function RokuChannels(name,url,description){
 	this.name = name;
 	this.url = url;
 	this.description = description;
 }
+DEFAULT_URL = 'http://www.rokuguide.com/channels';
 app.get('/scrape', function(req, res){
 
-url = 'http://www.rokuguide.com/channels';
 
-request(url, function(error, response, html){
+
+request(DEFAULT_URL, function(error, response, html){
     if(!error){
         var $ = cheerio.load(html);
 
@@ -23,23 +27,32 @@ request(url, function(error, response, html){
   
     $('div.view-content  table  tbody tr td').each(function(){
         var data = $(this);
-      	name=data.children().children().children().children().attr('alt');
-    	url = data.children().children().children().children().attr('src');
+      	url=data.children().next().children().children().attr('href');
+    	name = data.children().next().children().text();
 		arr.push(new RokuChannels(name,url,null));
-      	
+    	
     })
-	for(var a in arr){
-		if(arr[a].url!="undefined")
-			console.log(arr[a].url);
-	}
+    arr.splice(20,arr.length);
+    for(var a in arr){
+    	var path = buildPath(DEFAULT_URL,arr[a].url);
+    	request(path,function(err,response,html){
+
+    		if(!err)
+    		{
+    			var $ = cheerio.load(html);
+    			$(".field-items").filter(function(){
+    				var data = $(this);
+    				description = data.children().children().children().text();
+    				console.log(description);
+    			})
+    		}else
+    			throw err;
+    	})
+    }
  
 }
 
-// To write to the system we will use the built in 'fs' library.
-// In this example we will pass 3 parameters to the writeFile function
-// Parameter 1 :  output.json - this is what the created filename will be called
-// Parameter 2 :  JSON.stringify(json, null, 4) - the data to write, here we do an extra step by calling JSON.stringify to make our JSON easier to read
-// Parameter 3 :  callback function - a callback function to let us know the status of our function
+
 
 fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
 
@@ -47,7 +60,7 @@ fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
 
 })
 
-// Finally, we'll just send out a message to the browser reminding you that this app does not have a UI.
+
 res.send('Check your console!')
 
     }) ;
