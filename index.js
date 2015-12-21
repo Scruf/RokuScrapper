@@ -2,6 +2,8 @@ var express = require('express');
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
+var arr = [];
+var name,url,description;
 var app     = express();
 function RokuChannels(name,url,description){
 	this.name = name;
@@ -16,22 +18,21 @@ request(url, function(error, response, html){
     if(!error){
         var $ = cheerio.load(html);
 
-    var name, url,description;
+  
     var json = [{ name : "", url : "",description: ""}];
-    var arr = [];
-    $('div.view-content  table  tbody tr').each(function(){
+  
+    $('div.view-content  table  tbody tr td').each(function(){
         var data = $(this);
-        url=data.children().children().next().children().children().attr('href');
-    	description=data.children().text();
-    	name = data.children().children().next().children().children().text();
-    	arr.push(new RokuChannels(name,url,description));
-
+      	name=data.children().children().children().children().attr('alt');
+    	url = data.children().children().children().children().attr('src');
+		arr.push(new RokuChannels(name,url,null));
       	
     })
-		
-  for(var a in arr){
-  	console.log(arr[a].name);
-  }
+	for(var a in arr){
+		if(arr[a].url!="undefined")
+			console.log(arr[a].url);
+	}
+ 
 }
 
 // To write to the system we will use the built in 'fs' library.
