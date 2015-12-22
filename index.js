@@ -12,13 +12,16 @@ function RokuChannels(name,url,description){
 	this.name = name;
 	this.url = url;
 	this.description = description;
+  
 }
-DEFAULT_URL = 'http://www.rokuguide.com/channels';
+
+DEFAULT_URL = 'http://www.rokuguide.com';
+SCRAPE_LINKS_URL='http://www.rokuguide.com/channels'
 app.get('/scrape', function(req, res){
 
 
 
-request(DEFAULT_URL, function(error, response, html){
+request(SCRAPE_LINKS_URL, function(error, response, html){
     if(!error){
         var $ = cheerio.load(html);
 
@@ -32,26 +35,27 @@ request(DEFAULT_URL, function(error, response, html){
 		arr.push(new RokuChannels(name,url,null));
     	
     })
+    console.log(arr[0].url);
     arr.splice(20,arr.length);
-    for(var a in arr){
+  for(var a in arr){
     	var path = buildPath(DEFAULT_URL,arr[a].url);
     	request(path,function(err,response,html){
-
-    		if(!err)
+          if(!err)
     		{
     			var $ = cheerio.load(html);
-    			$("div.content.clearfix").filter(function(){
+    			$(".field-item").each(function(){
     				var data = $(this);
-    				description = data.children().children().children().text();
-    				console.log(description);
+                    arr.push(new RokuChannels(arr[a].name,path,data.children(':nth-child(1)').text()));
+    				/*arr[a].description=data.children(':nth-child(1)').text();*/
+                    
     			})
     		}else
     			throw err;
     	})
     }
- 
+   
+ console.log(arr.length);
 }
-
 
 
 fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
