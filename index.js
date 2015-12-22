@@ -40,7 +40,7 @@ request(DEFAULT_URL, function(error, response, html){
     		if(!err)
     		{
     			var $ = cheerio.load(html);
-    			$(".field-items").filter(function(){
+    			$("div.content.clearfix").filter(function(){
     				var data = $(this);
     				description = data.children().children().children().text();
     				console.log(description);
