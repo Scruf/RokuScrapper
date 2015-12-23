@@ -42,48 +42,9 @@ request(SCRAPE_LINKS_URL, function(error, response, html){
 		arr.push(new RokuChannels(name,url,null));
     	
     })
-  
+    console.log("Exiting scraping urls");
     arr.splice(20,arr.length);
-
    
-}
-
-for(var i=0;i<arr.length;i++){
-    console.log(arr[i].name);
-}
- for(var i=0;i<arr.length-1;i++){
-    
-        var path = buildPath(DEFAULT_URL,arr[i].url);
-        request(path,function(err,response,html){
-          if(!err)
-            {
-                var $ = cheerio.load(html);
-                $(".field-item").each(function(){
-                    var data = $(this);
-                    description =data.children(':nth-child(1)').text();
-                  
-                    console.log("URL",path);
-                    console.log("Description",description);
-                    channel = new Channel({
-                        name:arr[i].name,
-                        url:path,
-                        description:description
-                    });
-                    channel.save(function(err,channel){
-                        if(err)throw err;
-                        else
-                            console.dir(channel);
-                    })
-                  
-                    
-                })
-            }else
-                throw err;
-        });
-           
-}
-
-
 
 fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
 
@@ -94,7 +55,33 @@ fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
 
 
 res.send('Check your console!')
+for(var i=0;i<arr.length;i++)
+{
+    var temp = arr[i].name;
+    var path = buildPath(DEFAULT_URL,arr[i].url);
+    console.log(path);
+    request(path,function(err,res,body){
+        if(!err){
 
+            var $ = cheerio.load(body);
+           
+            $(".field-item").each(function(){
+                 var data = $(this);
+                 description =data.children(':nth-child(1)').text();
+                 console.log(temp);
+                    console.log(description)
+            });
+          
+           
+        }
+           
+        else
+            throw err;
+    });
+}
+
+           
+}
     }) ;
 })
 
