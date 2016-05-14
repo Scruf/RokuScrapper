@@ -5,7 +5,7 @@ var cheerio = require('cheerio');
 var arr = [];
 var name,url,description;
 var app     = express();
-var api_key = "mS1eukopD5Ulis8iu5qjc7ykx0YpsUYb";
+var api_key = "<your_api_key>";
 var mongoose = require('mongoose');
 var Channel = require('./Channel');
 var mongodbURI = "mongodb://ek5442:NokiaLumia920@ds033875.mongolab.com:33875/movies";
